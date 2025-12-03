@@ -2,9 +2,6 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Optional, Tuple, Any, Dict, List
 
-# ========================================= 1. SOHAIB =========================================
-
-
 @dataclass(order=True) # in order to generate comparison methods
 class Node:
     # node for grid pathfinding: stores position, A* costs (g,h,f), parent, visited flag, depth
