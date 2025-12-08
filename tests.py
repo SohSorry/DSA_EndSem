@@ -73,3 +73,53 @@ class TestRunner:
                 return False
                 
         return True
+
+    @staticmethod
+    def _test_simple_path() -> bool:
+        # 10x10 grid, start (0,0), goal (9,9)
+        grid = Grid(10, 10)
+        grid.set_start((0, 0))
+        grid.set_goal((9, 9))
+        
+        # test a* pathfinder
+        astar = AStarPathfinder(grid)
+        p1 = astar.find_path()
+        if not p1 or not TestRunner._validate_path(p1, grid):
+            print("    A* failed")
+            return False
+        
+        # test bfs pathfinder
+        bfs = BFSPathfinder(grid)
+        p2 = bfs.find_path()
+        if not p2 or not TestRunner._validate_path(p2, grid):
+            print("    BFS failed")
+            return False
+        
+        # test dfs pathfinder
+        dfs = DFSPathfinder(grid)
+        p3 = dfs.find_path()
+        if not p3 or not TestRunner._validate_path(p3, grid):
+            print("    DFS failed")
+            return False
+        
+        return True
+
+    @staticmethod
+    def _test_barrier_block() -> bool:
+        # 5x5 grid, wall in middle
+        grid = Grid(5, 5)
+        grid.set_start((0, 0))
+        grid.set_goal((0, 4))
+        
+        # block col 2 to create barrier
+        for r in range(5):
+            grid.add_barrier((r, 2))
+            
+        # both algorithms should return none (no path exists)
+        astar = AStarPathfinder(grid)
+        p1 = astar.find_path()
+        
+        bfs = BFSPathfinder(grid)
+        p2 = bfs.find_path()
+        
+        return p1 is None and p2 is None
