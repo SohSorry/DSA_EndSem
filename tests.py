@@ -123,3 +123,70 @@ class TestRunner:
         p2 = bfs.find_path()
         
         return p1 is None and p2 is None
+
+    @staticmethod
+    def _test_start_is_goal() -> bool:
+        grid = Grid(5, 5)
+        grid.set_start((2, 2))
+        grid.set_goal((2, 2))
+        
+        astar = AStarPathfinder(grid)
+        p1 = astar.find_path()
+        
+        # Should be length 1 (just the node)
+        return p1 is not None and len(p1) == 1 and p1[0] == (2, 2)
+
+    @staticmethod
+    def _test_complex_maze() -> bool:
+        # like 5x5 Snake maze
+        # S . . . .
+        # # # # # .
+        # . . . . .
+        # . # # # #
+        # . . . . G
+        grid = Grid(5, 5)
+        grid.set_start((0, 0))
+        grid.set_goal((4, 4))
+        
+        # Row 1 barriers but except hte last col
+        for c in range(4):
+            grid.add_barrier((1, c))
+        # Row 3 barriers but except the first col
+        for c in range(1, 5):
+            grid.add_barrier((3, c))
+            
+        astar = AStarPathfinder(grid)
+        p1 = astar.find_path()
+        
+        if not p1 or not TestRunner._validate_path(p1, grid):
+            return False
+            
+        return True
+
+    @staticmethod
+    def _test_optimality() -> bool:
+        # Shortest path from (0,0) to (4,4) is 8 steps acc to Manhattan distance
+        # Path length = 9 nodes
+        grid = Grid(5, 5)
+        grid.set_start((0, 0))
+        grid.set_goal((4, 4))
+        
+        astar = AStarPathfinder(grid)
+        p1 = astar.find_path()
+        
+        bfs = BFSPathfinder(grid)
+        p2 = bfs.find_path()
+        
+        # dfS is not guaranteed to be optimal, so i didnt don't check it here
+        
+        optimal_len = 9 # 4 down + 4 right + 1 start node
+        
+        if len(p1) != optimal_len:
+            print(f"    A* non-optimal: {len(p1)} vs {optimal_len}")
+            return False
+            
+        if len(p2) != optimal_len:
+            print(f"    BFS non-optimal: {len(p2)} vs {optimal_len}")
+            return False
+            
+        return True
